@@ -46,9 +46,10 @@ html.bg-off .music-bg {
   inset: -0.75rem -1.5rem;
   z-index: -1;
   border-radius: 1.5rem;
-  background: color-mix(in srgb, var(--color-base) 72%, transparent);
-  backdrop-filter: blur(3px);
-  -webkit-backdrop-filter: blur(3px);
+  /* Solid (no backdrop-filter): a backdrop blur would have to recompute every
+     time a flash changes the pixels behind it — expensive. A more opaque solid
+     scrim keeps text legible at no per-frame cost. */
+  background: color-mix(in srgb, var(--color-base) 82%, transparent);
   /* feather the edges so it blends into the page */
   -webkit-mask-image: radial-gradient(ellipse 100% 100% at 50% 50%, #000 55%, transparent 100%);
   mask-image: radial-gradient(ellipse 100% 100% at 50% 50%, #000 55%, transparent 100%);

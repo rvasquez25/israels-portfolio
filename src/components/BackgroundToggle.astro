@@ -33,9 +33,35 @@
       btn.setAttribute('aria-pressed', on ? 'true' : 'false');
     }
 
-    // Sync button to the state the head script already applied
-    var on = root.classList.contains('bg-off') ? false : true;
-    apply(on);
+    var saved = null;
+    try {
+      saved = localStorage.getItem(KEY);
+    } catch (e) {}
+    var reduced =
+      window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    var on;
+    if (saved === 'on' || saved === 'off') {
+      // Explicit user choice always wins.
+      on = saved === 'on';
+      apply(on);
+    } else if (reduced) {
+      on = false;
+      apply(false);
+    } else {
+      // No saved choice: start on, then measure this machine's frame rate for a
+      // moment. If the animation makes it stutter, switch it off automatically.
+      // Not persisted — a faster machine re-evaluates, and the user can still
+      // force it on (which then persists).
+      on = true;
+      apply(true);
+      probePerformance(function (tooSlow) {
+        if (tooSlow && on) {
+          on = false;
+          apply(false);
+        }
+      });
+    }
 
     btn.addEventListener('click', function () {
       on = !on;
@@ -44,6 +70,29 @@
       } catch (e) {}
       apply(on);
     });
+
+    // Sample frame timing while the background animates; report back whether
+    // the machine is struggling (low fps or many long frames).
+    function probePerformance(cb) {
+      if (!window.requestAnimationFrame || !window.performance) return;
+      var frames = 0;
+      var longFrames = 0;
+      var start = performance.now();
+      var last = start;
+      function tick(now) {
+        var dt = now - last;
+        last = now;
+        frames++;
+        if (dt > 26) longFrames++; // > ~38fps frame
+        if (now - start < 900) {
+          requestAnimationFrame(tick);
+        } else {
+          var fps = frames / ((now - start) / 1000);
+          cb(fps < 45 || longFrames > 6);
+        }
+      }
+      requestAnimationFrame(tick);
+    }
   })();
 </script>
 
@@ -64,7 +113,6 @@
     font-weight: 600;
     line-height: 1;
     cursor: pointer;
-    backdrop-filter: blur(6px);
     transition: color 0.2s, border-color 0.2s, background 0.2s, box-shadow 0.2s,
       transform 0.15s;
   }

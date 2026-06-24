@@ -14,7 +14,7 @@ const STAFF_GAP = 12; // vertical gap between the 5 lines of a staff
 const x0 = -140;
 const x1 = VIEW_W + 140;
 const MID_X = VIEW_W / 2;
-const step = 34; // sampling density of the wave paths — larger = fewer segments
+const step = 42; // sampling density of the wave paths — larger = fewer segments
 
 type Target = {
   dir: 'lr' | 'rl';
@@ -66,24 +66,48 @@ const staves = staffConfigs.map((cfg) => ({
 
 // Notes ride the staff lines and share their staff's sequence slot.
 const glyphs = ['♪', '♫', '♩', '♬'];
-const noteXs = [120, 340, 560, 780, 1000, 1220, 1440];
+const noteXs = [180, 470, 760, 1050, 1340];
 let gi = 0;
-const notes = staffConfigs.flatMap((cfg, s) =>
-  noteXs.map((x, k) => {
-    const lineOffset = ((k + s) % 5) - 2;
-    const size = 28 + ((gi % 3) * 8);
-    const note = {
-      x,
-      y: (yAt(cfg, x, lineOffset * STAFF_GAP) + size * 0.32).toFixed(1),
+const noteDefs = staffConfigs.flatMap((cfg, s) =>
+  noteXs.map((baseX, k) => {
+    const def = {
+      cfg,
+      baseX,
+      lineOffset: ((k + s) % 5) - 2,
+      size: 28 + ((gi % 3) * 8),
       glyph: glyphs[gi % glyphs.length],
-      size,
       color: cfg.color,
       seq: cfg.seq,
     };
     gi++;
-    return note;
+    return def;
   })
 );
+
+// Notes compress toward center on smaller screens (more fit within the cropped
+// view), and spread out on large ones. The staves are NOT scaled — instead
+// each note's y is recomputed from the staff formula at its compressed x, so
+// notes always sit ON the lines. One set per breakpoint, toggled via CSS
+// display (display:none sets don't render or animate → no runtime cost).
+const noteSets = [
+  { cls: 'notes-mobile', factor: 0.5 },
+  { cls: 'notes-mid', factor: 0.72 },
+  { cls: 'notes-desktop', factor: 1.0 },
+  { cls: 'notes-xl', factor: 1.12 },
+];
+function placeNotes(factor: number) {
+  return noteDefs.map((d) => {
+    const x = MID_X + factor * (d.baseX - MID_X);
+    return {
+      x: x.toFixed(1),
+      y: (yAt(d.cfg, x, d.lineOffset * STAFF_GAP) + d.size * 0.32).toFixed(1),
+      size: d.size,
+      glyph: d.glyph,
+      color: d.color,
+      seq: d.seq,
+    };
+  });
+}
 ---
 
 <div class="music-bg" aria-hidden="true">
@@ -92,6 +116,7 @@ const notes = staffConfigs.flatMap((cfg, s) =>
     preserveAspectRatio="xMidYMid slice"
     xmlns="http://www.w3.org/2000/svg"
   >
+    {/* Staves always span full width (not scaled) */}
     {
       staves.map(({ cfg, lines }) => (
         <g class={`staff staff-${cfg.color}`}>
@@ -101,16 +126,21 @@ const notes = staffConfigs.flatMap((cfg, s) =>
         </g>
       ))
     }
+    {/* One note set per breakpoint; CSS shows only the matching one */}
     {
-      notes.map((n) => (
-        <text
-          class={`note note-${n.color} nseq-${n.seq}`}
-          x={n.x}
-          y={n.y}
-          font-size={n.size}
-        >
-          {n.glyph}
-        </text>
+      noteSets.map((set) => (
+        <g class={`notes-group ${set.cls}`}>
+          {placeNotes(set.factor).map((n) => (
+            <text
+              class={`note note-${n.color} nseq-${n.seq}`}
+              x={n.x}
+              y={n.y}
+              font-size={n.size}
+            >
+              {n.glyph}
+            </text>
+          ))}
+        </g>
       ))
     }
   </svg>
@@ -136,6 +166,40 @@ const notes = staffConfigs.flatMap((cfg, s) =>
     display: block;
   }
 
+  /* Responsive note spacing: show only the note set matching the screen size.
+     Hidden sets are display:none → they don't render or animate (no cost).
+     Staves are untouched and always span the full width. */
+  .notes-group {
+    display: none;
+  }
+  .notes-desktop {
+    display: inline; /* default for 1025–1439px */
+  }
+  @media (max-width: 640px) {
+    .notes-desktop {
+      display: none;
+    }
+    .notes-mobile {
+      display: inline;
+    }
+  }
+  @media (min-width: 641px) and (max-width: 1024px) {
+    .notes-desktop {
+      display: none;
+    }
+    .notes-mid {
+      display: inline;
+    }
+  }
+  @media (min-width: 1440px) {
+    .notes-desktop {
+      display: none;
+    }
+    .notes-xl {
+      display: inline;
+    }
+  }
+
   /* ---- Staff lines: directional stroke-draw sweep ---- */
   .staff path {
     fill: none;
@@ -145,13 +209,14 @@ const notes = staffConfigs.flatMap((cfg, s) =>
     stroke-dashoffset: 1;
     opacity: 0;
   }
+  /* No drop-shadow on the staff paths: they're long and animated (dashoffset),
+     so a per-frame filter recompute here is the heaviest cost on weak GPUs.
+     A bright stroke on the dark background reads well without it. */
   .staff-accent path {
     stroke: var(--color-accent-soft);
-    filter: drop-shadow(0 0 3.5px var(--color-accent));
   }
   .staff-gold path {
     stroke: var(--color-gold-soft);
-    filter: drop-shadow(0 0 3.5px var(--color-gold));
   }
 
   /* left→right reveal: dashoffset 1 → 0 draws from the start (left) */
@@ -212,11 +277,11 @@ const notes = staffConfigs.flatMap((cfg, s) =>
   }
   .note-accent {
     fill: var(--color-accent-soft);
-    filter: drop-shadow(0 0 5px var(--color-accent));
+    filter: drop-shadow(0 0 4px var(--color-accent));
   }
   .note-gold {
     fill: var(--color-gold-soft);
-    filter: drop-shadow(0 0 5px var(--color-gold));
+    filter: drop-shadow(0 0 4px var(--color-gold));
   }
   @keyframes noteflash {
     0% {
