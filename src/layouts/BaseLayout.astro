@@ -1,5 +1,7 @@
 ---
 import '../styles/global.css';
+import MusicBackground from '../components/MusicBackground.astro';
+import BackgroundToggle from '../components/BackgroundToggle.astro';
 import site from '../data/site.json';
 import pricing from '../data/pricing.json';
 
@@ -63,8 +65,20 @@ const jsonLd = {
     />
 
     <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+
+    <!-- Apply the saved background-animation preference before first paint to
+         avoid a flash of animation when the user has turned it off. -->
+    <script is:inline>
+      try {
+        if (localStorage.getItem('bg-anim') === 'off') {
+          document.documentElement.classList.add('bg-off');
+        }
+      } catch (e) {}
+    </script>
   </head>
   <body>
+    <MusicBackground />
     <slot />
+    <BackgroundToggle />
   </body>
 </html>

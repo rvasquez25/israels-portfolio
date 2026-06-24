@@ -1,0 +1,283 @@
+---
+// Ambient flash-reveal background: ONE staff + its notes on screen at a time,
+// playing in sequence. Each staff's slope matches its sweep direction:
+//   • left→right entry  → angles downward to the right
+//   • right→left entry  → enters from the right, angles downward to the left
+// Only a single staff animates at any moment (the rest hold an invisible
+// state, so they don't repaint) — keeps the effect cheap. Rendered once in
+// BaseLayout; can be toggled off by the user (html.bg-off hides it).
+
+const VIEW_W = 1600;
+const VIEW_H = 900;
+const WAVELENGTH = 460; // wavelength of the waviness, in px of width
+const STAFF_GAP = 12; // vertical gap between the 5 lines of a staff
+const x0 = -140;
+const x1 = VIEW_W + 140;
+const MID_X = VIEW_W / 2;
+const step = 34; // sampling density of the wave paths — larger = fewer segments
+
+type Target = {
+  dir: 'lr' | 'rl';
+  mag: number; // slope magnitude (steepness)
+  centerY: number; // target y at mid-screen, for placement
+  amp: number;
+  phase: number;
+  color: 'accent' | 'gold';
+};
+
+// One staff shown at a time, alternating entry direction. Slope sign is derived
+// from direction so the angle always follows the entry side.
+const targets: Target[] = [
+  { dir: 'lr', mag: 0.52, centerY: 300, amp: 22, phase: 0.0, color: 'accent' },
+  { dir: 'rl', mag: 0.48, centerY: 470, amp: 24, phase: 1.2, color: 'gold' },
+  { dir: 'lr', mag: 0.45, centerY: 380, amp: 20, phase: 0.6, color: 'accent' },
+  { dir: 'rl', mag: 0.55, centerY: 520, amp: 22, phase: 2.0, color: 'gold' },
+];
+
+const staffConfigs = targets.map((t, i) => {
+  const slope = t.dir === 'lr' ? t.mag : -t.mag; // lr descends right, rl descends left
+  const baseY = t.centerY - slope * (MID_X - x0); // place so it passes through centerY at mid-screen
+  return { baseY, slope, amp: t.amp, phase: t.phase, color: t.color, seq: i };
+});
+type Cfg = (typeof staffConfigs)[number];
+
+function yAt(cfg: Cfg, x: number, offset = 0): number {
+  return (
+    cfg.baseY +
+    offset +
+    cfg.slope * (x - x0) +
+    cfg.amp * Math.sin((x / WAVELENGTH) * Math.PI * 2 + cfg.phase)
+  );
+}
+
+function hwave(cfg: Cfg, offset: number): string {
+  let d = '';
+  for (let x = x0; x <= x1; x += step) {
+    const y = yAt(cfg, x, offset).toFixed(1);
+    d += x === x0 ? `M ${x} ${y}` : ` L ${x} ${y}`;
+  }
+  return d;
+}
+
+const staves = staffConfigs.map((cfg) => ({
+  cfg,
+  lines: Array.from({ length: 5 }, (_, i) => hwave(cfg, (i - 2) * STAFF_GAP)),
+}));
+
+// Notes ride the staff lines and share their staff's sequence slot.
+const glyphs = ['♪', '♫', '♩', '♬'];
+const noteXs = [120, 340, 560, 780, 1000, 1220, 1440];
+let gi = 0;
+const notes = staffConfigs.flatMap((cfg, s) =>
+  noteXs.map((x, k) => {
+    const lineOffset = ((k + s) % 5) - 2;
+    const size = 28 + ((gi % 3) * 8);
+    const note = {
+      x,
+      y: (yAt(cfg, x, lineOffset * STAFF_GAP) + size * 0.32).toFixed(1),
+      glyph: glyphs[gi % glyphs.length],
+      size,
+      color: cfg.color,
+      seq: cfg.seq,
+    };
+    gi++;
+    return note;
+  })
+);
+---
+
+<div class="music-bg" aria-hidden="true">
+  <svg
+    viewBox={`0 0 ${VIEW_W} ${VIEW_H}`}
+    preserveAspectRatio="xMidYMid slice"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    {
+      staves.map(({ cfg, lines }) => (
+        <g class={`staff staff-${cfg.color}`}>
+          {lines.map((d) => (
+            <path class={`seq-${cfg.seq}`} d={d} pathLength="1" />
+          ))}
+        </g>
+      ))
+    }
+    {
+      notes.map((n) => (
+        <text
+          class={`note note-${n.color} nseq-${n.seq}`}
+          x={n.x}
+          y={n.y}
+          font-size={n.size}
+        >
+          {n.glyph}
+        </text>
+      ))
+    }
+  </svg>
+</div>
+
+<style>
+  .music-bg {
+    position: fixed;
+    inset: 0;
+    z-index: -1; /* above body bg, below all content */
+    pointer-events: none;
+    overflow: hidden;
+    opacity: 0.9;
+    /* Promote to its own compositor layer and contain paint so the
+       background's animation repaints stay isolated from page content. */
+    transform: translateZ(0);
+    will-change: transform;
+    contain: layout paint;
+  }
+  .music-bg svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  /* ---- Staff lines: directional stroke-draw sweep ---- */
+  .staff path {
+    fill: none;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-dasharray: 1 1; /* with pathLength="1" → animatable directional draw */
+    stroke-dashoffset: 1;
+    opacity: 0;
+  }
+  .staff-accent path {
+    stroke: var(--color-accent-soft);
+    filter: drop-shadow(0 0 3.5px var(--color-accent));
+  }
+  .staff-gold path {
+    stroke: var(--color-gold-soft);
+    filter: drop-shadow(0 0 3.5px var(--color-gold));
+  }
+
+  /* left→right reveal: dashoffset 1 → 0 draws from the start (left) */
+  @keyframes drawLR {
+    0% {
+      stroke-dashoffset: 1;
+      opacity: 0;
+    }
+    1% {
+      opacity: 1;
+    }
+    9% {
+      stroke-dashoffset: 0;
+      opacity: 1;
+    }
+    19% {
+      stroke-dashoffset: 0;
+      opacity: 1;
+    }
+    22% {
+      opacity: 0;
+    }
+    100% {
+      stroke-dashoffset: 0;
+      opacity: 0;
+    }
+  }
+  /* right→left reveal: dashoffset -1 → 0 draws from the end (right) */
+  @keyframes drawRL {
+    0% {
+      stroke-dashoffset: -1;
+      opacity: 0;
+    }
+    1% {
+      opacity: 1;
+    }
+    9% {
+      stroke-dashoffset: 0;
+      opacity: 1;
+    }
+    19% {
+      stroke-dashoffset: 0;
+      opacity: 1;
+    }
+    22% {
+      opacity: 0;
+    }
+    100% {
+      stroke-dashoffset: 0;
+      opacity: 0;
+    }
+  }
+
+  /* ---- Notes: glow + flash, timed inside their staff's lit window ---- */
+  .note {
+    font-family: 'Segoe UI Symbol', 'Noto Music', sans-serif;
+    opacity: 0;
+  }
+  .note-accent {
+    fill: var(--color-accent-soft);
+    filter: drop-shadow(0 0 5px var(--color-accent));
+  }
+  .note-gold {
+    fill: var(--color-gold-soft);
+    filter: drop-shadow(0 0 5px var(--color-gold));
+  }
+  @keyframes noteflash {
+    0% {
+      opacity: 0;
+    }
+    10% {
+      opacity: 0;
+    }
+    13% {
+      opacity: 1;
+    }
+    19% {
+      opacity: 1;
+    }
+    22% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+
+  /* ---- Sequence: 20s cycle, one staff active per 5s slot (delays 0/5/10/15).
+     Each staff's keyframe is "on" only in its first 25% of the timeline, so
+     exactly one staff is visible at a time. ---- */
+  .seq-0 {
+    animation: drawLR 20s ease-in-out infinite 0s;
+  }
+  .seq-1 {
+    animation: drawRL 20s ease-in-out infinite 5s;
+  }
+  .seq-2 {
+    animation: drawLR 20s ease-in-out infinite 10s;
+  }
+  .seq-3 {
+    animation: drawRL 20s ease-in-out infinite 15s;
+  }
+  .nseq-0 {
+    animation: noteflash 20s ease-in-out infinite 0s;
+  }
+  .nseq-1 {
+    animation: noteflash 20s ease-in-out infinite 5s;
+  }
+  .nseq-2 {
+    animation: noteflash 20s ease-in-out infinite 10s;
+  }
+  .nseq-3 {
+    animation: noteflash 20s ease-in-out infinite 15s;
+  }
+
+  /* Honor reduced-motion: faint static hint of one staff, no flashing */
+  @media (prefers-reduced-motion: reduce) {
+    .staff path,
+    .note {
+      animation: none;
+      stroke-dashoffset: 0;
+      opacity: 0;
+    }
+    .seq-0,
+    .nseq-0 {
+      opacity: 0.22;
+    }
+  }
+</style>

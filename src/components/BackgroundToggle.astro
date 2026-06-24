@@ -1,0 +1,128 @@
+---
+// Small fixed control to turn the animated music background on/off. State is
+// persisted in localStorage and applied to <html> (class "bg-off"). The
+// initial state is set pre-paint by an inline script in BaseLayout's <head>
+// to avoid a flash; this script just wires the button and keeps it in sync.
+---
+
+<button
+  id="bg-toggle"
+  class="bg-toggle"
+  type="button"
+  aria-pressed="true"
+  aria-label="Toggle background animation"
+  title="Toggle background animation"
+>
+  <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M9 18V5l12-2v13" />
+    <circle cx="6" cy="18" r="3" />
+    <circle cx="18" cy="16" r="3" />
+  </svg>
+  <span class="label"><span class="on-label">Animation on</span><span class="off-label">Animation off</span></span>
+</button>
+
+<script is:inline>
+  (function () {
+    var KEY = 'bg-anim';
+    var root = document.documentElement;
+    var btn = document.getElementById('bg-toggle');
+    if (!btn) return;
+
+    function apply(on) {
+      root.classList.toggle('bg-off', !on);
+      btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+    }
+
+    // Sync button to the state the head script already applied
+    var on = root.classList.contains('bg-off') ? false : true;
+    apply(on);
+
+    btn.addEventListener('click', function () {
+      on = !on;
+      try {
+        localStorage.setItem(KEY, on ? 'on' : 'off');
+      } catch (e) {}
+      apply(on);
+    });
+  })();
+</script>
+
+<style>
+  .bg-toggle {
+    position: fixed;
+    left: 1rem;
+    bottom: 1rem;
+    z-index: 50;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1rem;
+    border-radius: 9999px;
+    border: 1.5px solid;
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    font-weight: 600;
+    line-height: 1;
+    cursor: pointer;
+    backdrop-filter: blur(6px);
+    transition: color 0.2s, border-color 0.2s, background 0.2s, box-shadow 0.2s,
+      transform 0.15s;
+  }
+  .bg-toggle:hover {
+    transform: translateY(-1px);
+  }
+  .bg-toggle:active {
+    transform: translateY(0);
+  }
+  .bg-toggle .icon {
+    width: 1.05rem;
+    height: 1.05rem;
+    flex-shrink: 0;
+  }
+
+  /* ON → gold/orange theme (matches the gold staff + notes) */
+  .bg-toggle[aria-pressed='true'] {
+    color: var(--color-gold-soft);
+    border-color: var(--color-gold);
+    background: color-mix(in srgb, var(--color-gold) 18%, var(--color-elevated));
+    box-shadow: 0 0 14px color-mix(in srgb, var(--color-gold) 40%, transparent);
+  }
+  .bg-toggle[aria-pressed='true'] .icon {
+    color: var(--color-gold-soft);
+  }
+  .bg-toggle[aria-pressed='true']:hover {
+    box-shadow: 0 0 18px color-mix(in srgb, var(--color-gold) 55%, transparent);
+  }
+
+  /* OFF → blue theme (matches the site's accent blue) */
+  .bg-toggle[aria-pressed='false'] {
+    color: var(--color-accent-soft);
+    border-color: var(--color-accent);
+    background: color-mix(in srgb, var(--color-accent) 18%, var(--color-elevated));
+    box-shadow: 0 0 14px color-mix(in srgb, var(--color-accent) 35%, transparent);
+  }
+  .bg-toggle[aria-pressed='false'] .icon {
+    color: var(--color-accent-soft);
+  }
+  .bg-toggle[aria-pressed='false']:hover {
+    box-shadow: 0 0 18px color-mix(in srgb, var(--color-accent) 50%, transparent);
+  }
+
+  /* Show the correct label based on state */
+  .bg-toggle[aria-pressed='true'] .off-label {
+    display: none;
+  }
+  .bg-toggle[aria-pressed='false'] .on-label {
+    display: none;
+  }
+
+  /* Keep it unobtrusive on small screens: icon only */
+  @media (max-width: 640px) {
+    .bg-toggle .label {
+      display: none;
+    }
+    .bg-toggle {
+      padding: 0.6rem;
+    }
+  }
+</style>

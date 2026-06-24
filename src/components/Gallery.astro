@@ -1,7 +1,7 @@
 ---
 import gallery from '../data/gallery.json';
+import site from '../data/site.json';
 
-// Build an embed URL for supported providers.
 function embedUrl(provider: string, id: string) {
   if (provider === 'youtube') return `https://www.youtube-nocookie.com/embed/${id}`;
   if (provider === 'vimeo') return `https://player.vimeo.com/video/${id}`;
@@ -21,32 +21,37 @@ function embedUrl(provider: string, id: string) {
 
     <div class="mt-12 grid gap-6 sm:grid-cols-2">
       {
-        gallery.items.map((item) =>
-          item.type === 'video' ? (
-            <figure class="overflow-hidden rounded-2xl border border-white/10 bg-base">
-              {item.videoId ? (
-                <div class="aspect-video-embed">
-                  <iframe
-                    src={embedUrl(item.provider ?? 'youtube', item.videoId)}
-                    title={item.title}
-                    loading="lazy"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowfullscreen
-                  />
-                </div>
-              ) : (
-                <div class="flex aspect-video items-center justify-center bg-gradient-to-br from-navy-deep to-base text-center">
-                  <div class="text-muted">
-                    <svg class="mx-auto h-10 w-10 text-accent/60" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M8 5v14l11-7z" />
-                    </svg>
-                    <p class="mt-2 text-sm">Demo video coming soon</p>
+        gallery.items.map((item) => {
+          if (item.type === 'video') {
+            const url = embedUrl(item.provider ?? 'youtube', item.videoId ?? '');
+            return (
+              <figure class="overflow-hidden rounded-2xl border border-white/10 bg-base">
+                {url ? (
+                  <div class="aspect-video-embed">
+                    <iframe
+                      src={url}
+                      title={item.title}
+                      loading="lazy"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowfullscreen
+                    />
                   </div>
-                </div>
-              )}
-              <figcaption class="px-5 py-3 text-sm text-muted">{item.caption}</figcaption>
-            </figure>
-          ) : (
+                ) : (
+                  <div class="flex aspect-video items-center justify-center bg-gradient-to-br from-navy-deep to-base text-center">
+                    <div class="text-muted">
+                      <svg class="mx-auto h-10 w-10 text-accent/60" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                        <path d="M8 5v14l11-7z" />
+                      </svg>
+                      <p class="mt-2 text-sm">Demo video coming soon</p>
+                    </div>
+                  </div>
+                )}
+                <figcaption class="px-5 py-3 text-sm text-muted">{item.caption}</figcaption>
+              </figure>
+            );
+          }
+
+          return (
             <figure class="group relative overflow-hidden rounded-2xl border border-white/10">
               <div class="aspect-video bg-gradient-to-br from-navy-mid/40 to-elevated">
                 <img
@@ -61,14 +66,14 @@ function embedUrl(provider: string, id: string) {
                 {item.caption}
               </figcaption>
             </figure>
-          )
-        )
+          );
+        })
       }
     </div>
 
     <p class="mt-8 text-center text-sm text-muted">
-      More on Instagram —
-      <a href="https://instagram.com/e_zmusic" class="text-accent-soft hover:underline">@e_zmusic</a>
+      More performances on Instagram —
+      <a href={site.instagramUrl} target="_blank" rel="noopener noreferrer" class="text-accent-soft hover:underline">@{site.instagram}</a>
     </p>
   </div>
 </section>

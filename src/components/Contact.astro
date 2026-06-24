@@ -7,7 +7,7 @@ import lessons from '../data/lessons.json';
   <div class="mx-auto max-w-6xl px-5">
     <div class="grid gap-12 md:grid-cols-2">
       <!-- Intro + direct contact -->
-      <div>
+      <div class="text-scrim">
         <p class="text-sm font-semibold uppercase tracking-[0.25em] text-accent">
           Get in touch
         </p>
@@ -30,7 +30,7 @@ import lessons from '../data/lessons.json';
             </span>
           </a>
 
-          <a href={site.instagramUrl} class="flex items-center gap-4 group">
+          <a href={site.instagramUrl} target="_blank" rel="noopener noreferrer" class="flex items-center gap-4 group">
             <span class="flex h-11 w-11 items-center justify-center rounded-xl bg-navy-deep text-accent transition-colors group-hover:bg-accent group-hover:text-base">
               <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" /><circle cx="12" cy="12" r="4" /><circle cx="17.5" cy="6.5" r="0.5" fill="currentColor" /></svg>
             </span>
@@ -51,7 +51,7 @@ import lessons from '../data/lessons.json';
         action="/thank-you"
         data-netlify="true"
         netlify-honeypot="bot-field"
-        class="rounded-2xl border border-white/10 bg-elevated/60 p-6 sm:p-8"
+        class="rounded-2xl border border-white/10 bg-elevated/85 p-6 sm:p-8 backdrop-blur-sm"
       >
         <input type="hidden" name="form-name" value="lesson-inquiry" />
         <p class="hidden">

@@ -10,7 +10,7 @@ A fast, static portfolio site for Israel Vasquez's music lessons (piano, marchin
 | Styling      | Tailwind CSS v4 (`@theme` tokens) |
 | Fonts        | Playfair Display + Inter (Google Fonts) |
 | Contact form | Netlify Forms                   |
-| Video        | YouTube / Vimeo embeds          |
+| Video / Social | YouTube / Vimeo embeds · Instagram link-out cards |
 | Hosting      | Netlify (Git auto-deploy)       |
 
 ## Local development
@@ -32,7 +32,7 @@ All site content lives in plain JSON under [`src/data/`](src/data/):
 | `about.json`   | About Me bio, photo, credentials                    |
 | `lessons.json` | The five lesson types + "what's included" perks     |
 | `pricing.json` | Lesson rates ($25 / $30 / $35)                      |
-| `gallery.json` | Photos and demo video embeds                        |
+| `gallery.json` | Photos, YouTube/Vimeo embeds, and Instagram links   |
 
 Edit the values, commit, and Netlify redeploys automatically.
 
@@ -47,15 +47,37 @@ path (e.g. `/images/israel-marching.jpg`). Replace these placeholders:
 
 Image areas degrade gracefully to a navy gradient if a file is missing.
 
-### Adding demo videos
+### Adding demo videos and Instagram links
 
-In `gallery.json`, set a video item's `videoId` to the YouTube/Vimeo ID:
+The gallery supports three video providers in `gallery.json`:
 
+**YouTube** — set `videoId` to the ID from the URL (`https://youtu.be/dQw4w9WgXcQ` → `dQw4w9WgXcQ`):
 ```json
 { "type": "video", "provider": "youtube", "videoId": "dQw4w9WgXcQ", "caption": "Snare solo" }
 ```
 
-(For `https://youtu.be/dQw4w9WgXcQ`, the ID is `dQw4w9WgXcQ`.)
+**Vimeo** — set `videoId` to the numeric ID from the Vimeo URL:
+```json
+{ "type": "video", "provider": "vimeo", "videoId": "123456789", "caption": "Marimba excerpt" }
+```
+
+**Instagram** — Instagram doesn't allow embedding, so this renders a branded link-out card.
+Set `url` to the full post or reel URL:
+```json
+{ "type": "video", "provider": "instagram", "url": "https://www.instagram.com/reel/XXXXXX/", "caption": "Watch on Instagram" }
+```
+Leave `url` empty and the card shows "Coming soon on Instagram" as a placeholder.
+
+### Instagram links
+
+The `@e_zmusic` Instagram handle appears in:
+- **Nav** — icon button (desktop) and menu item (mobile)
+- **Hero** — inline below the phone number
+- **Gallery** — "More performances on Instagram" footer link
+- **Contact** — direct contact row
+- **Footer** — right-hand links
+
+To update the handle, edit `instagram` and `instagramUrl` in `src/data/site.json` — all locations update automatically.
 
 ## Deploying to Netlify
 

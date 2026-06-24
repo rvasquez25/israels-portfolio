@@ -27,6 +27,34 @@ html {
   scroll-padding-top: 5rem; /* offset for the fixed nav when anchoring */
 }
 
+/* User toggle: when off, the animated music background is fully removed from
+   rendering (display:none) so it costs nothing. Set by BackgroundToggle. */
+html.bg-off .music-bg {
+  display: none;
+}
+
+/* Readability scrim: darkens + blurs the animated flashes behind a text block
+   while feathering out at the edges, so text stays legible but the effect
+   still reads around it. Apply to text columns over the background. */
+.text-scrim {
+  position: relative;
+  isolation: isolate;
+}
+.text-scrim::before {
+  content: '';
+  position: absolute;
+  inset: -0.75rem -1.5rem;
+  z-index: -1;
+  border-radius: 1.5rem;
+  background: color-mix(in srgb, var(--color-base) 72%, transparent);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  /* feather the edges so it blends into the page */
+  -webkit-mask-image: radial-gradient(ellipse 100% 100% at 50% 50%, #000 55%, transparent 100%);
+  mask-image: radial-gradient(ellipse 100% 100% at 50% 50%, #000 55%, transparent 100%);
+  pointer-events: none;
+}
+
 body {
   background-color: var(--color-base);
   color: var(--color-ink);
