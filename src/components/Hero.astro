@@ -1,0 +1,66 @@
+---
+import site from '../data/site.json';
+---
+
+<section id="top" class="relative overflow-hidden">
+  <!-- layered navy gradient backdrop -->
+  <div class="absolute inset-0 -z-10 bg-gradient-to-b from-navy-deep/40 via-base to-base"></div>
+  <div class="absolute -top-32 -right-32 -z-10 h-96 w-96 rounded-full bg-accent/10 blur-3xl"></div>
+  <div class="absolute top-40 -left-24 -z-10 h-72 w-72 rounded-full bg-navy-mid/30 blur-3xl"></div>
+
+  <div class="mx-auto max-w-6xl px-5 pt-32 pb-20 md:pt-40 md:pb-28">
+    <div class="grid items-center gap-12 md:grid-cols-2">
+      <div>
+        <p class="mb-4 text-sm font-semibold uppercase tracking-[0.3em] text-accent">
+          {site.tagline}
+        </p>
+        <h1 class="font-display text-5xl font-extrabold leading-[1.05] text-ink sm:text-6xl lg:text-7xl">
+          Israel<br />Vasquez
+        </h1>
+        <p class="mt-6 max-w-md text-lg leading-relaxed text-muted">
+          {site.intro}
+        </p>
+
+        <div class="mt-8 flex flex-wrap items-center gap-4">
+          <a
+            href="#contact"
+            class="inline-flex items-center rounded-full bg-accent px-7 py-3 font-semibold text-base shadow-lg shadow-accent/20 transition-transform hover:-translate-y-0.5 hover:bg-accent-soft"
+          >
+            Book a Lesson
+          </a>
+          <a
+            href="#lessons"
+            class="inline-flex items-center rounded-full border border-white/15 px-7 py-3 font-semibold text-ink transition-colors hover:border-gold/60 hover:text-gold-soft"
+          >
+            See Lessons
+          </a>
+        </div>
+
+        <p class="mt-8 text-sm text-muted">
+          📍 {site.location} ·
+          <a href={`tel:${site.phoneHref}`} class="text-accent-soft hover:underline">{site.phone}</a>
+        </p>
+      </div>
+
+      <!-- Portrait frame — gold border echoes the flyer. Replace the image
+           file at /images/israel-marching.jpg with Israel's real photo. -->
+      <div class="relative mx-auto w-full max-w-sm">
+        <div class="rounded-2xl border-2 border-gold/70 p-2 shadow-2xl shadow-black/50">
+          <div class="aspect-[4/5] overflow-hidden rounded-xl bg-gradient-to-br from-navy-deep to-elevated">
+            <img
+              src="/images/israel-marching.jpg"
+              alt="Israel Vasquez in his UTEP Marching Miners uniform"
+              class="h-full w-full object-cover"
+              loading="eager"
+              onerror="this.style.display='none'"
+            />
+          </div>
+        </div>
+        <div class="absolute -bottom-4 -right-4 rounded-xl border border-gold/40 bg-elevated/90 px-4 py-3 backdrop-blur">
+          <p class="text-xs uppercase tracking-wider text-muted">Instructor</p>
+          <p class="font-display font-semibold text-ink">UTEP · WGI</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,32 @@
+{
+  "heading": "Performances & Demos",
+  "subheading": "A look at the playing behind the lessons.",
+  "items": [
+    {
+      "type": "video",
+      "provider": "youtube",
+      "videoId": "",
+      "title": "Marching percussion demo",
+      "caption": "Snare technique breakdown"
+    },
+    {
+      "type": "video",
+      "provider": "youtube",
+      "videoId": "",
+      "title": "Keyboard percussion demo",
+      "caption": "Four-mallet marimba excerpt"
+    },
+    {
+      "type": "image",
+      "src": "/images/gallery/performance-1.jpg",
+      "alt": "Israel performing with the drumline",
+      "caption": "UTEP Marching Miners"
+    },
+    {
+      "type": "image",
+      "src": "/images/gallery/performance-2.jpg",
+      "alt": "Israel reading music on the field",
+      "caption": "Game day with UTEP Bands"
+    }
+  ]
+}

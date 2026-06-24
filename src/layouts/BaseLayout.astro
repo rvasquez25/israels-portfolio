@@ -1,0 +1,70 @@
+---
+import '../styles/global.css';
+import site from '../data/site.json';
+import pricing from '../data/pricing.json';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = `${site.name} — Music Lessons`,
+  description = `${site.name} offers piano, percussion, and drumset lessons for all levels in ${site.location}. ${pricing.note}`,
+} = Astro.props;
+
+// schema.org structured data so Israel surfaces well in search and link
+// previews. Lesson rates are mapped to Offer entries.
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: site.name,
+  jobTitle: 'Music Instructor',
+  description,
+  telephone: site.phoneHref,
+  areaServed: site.location,
+  sameAs: [site.instagramUrl],
+  makesOffer: pricing.tiers.map((t) => ({
+    '@type': 'Offer',
+    priceCurrency: 'USD',
+    price: t.price,
+    itemOffered: {
+      '@type': 'Service',
+      name: `Music lesson (${t.duration})`,
+    },
+  })),
+};
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+
+    <title>{title}</title>
+    <meta name="description" content={description} />
+
+    <!-- Open Graph / social sharing -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content="/images/og-image.jpg" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <!-- Fonts: serif display (flyer feel) + clean sans body -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>

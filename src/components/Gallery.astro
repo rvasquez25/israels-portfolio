@@ -1,0 +1,74 @@
+---
+import gallery from '../data/gallery.json';
+
+// Build an embed URL for supported providers.
+function embedUrl(provider: string, id: string) {
+  if (provider === 'youtube') return `https://www.youtube-nocookie.com/embed/${id}`;
+  if (provider === 'vimeo') return `https://player.vimeo.com/video/${id}`;
+  return '';
+}
+---
+
+<section id="gallery" class="bg-elevated/40 py-20 md:py-28">
+  <div class="mx-auto max-w-6xl px-5">
+    <div class="mx-auto max-w-2xl text-center">
+      <h2 class="font-display text-3xl font-bold text-ink sm:text-4xl">
+        {gallery.heading}
+      </h2>
+      <p class="mt-4 text-muted">{gallery.subheading}</p>
+      <div class="divider-gem mt-6">◆</div>
+    </div>
+
+    <div class="mt-12 grid gap-6 sm:grid-cols-2">
+      {
+        gallery.items.map((item) =>
+          item.type === 'video' ? (
+            <figure class="overflow-hidden rounded-2xl border border-white/10 bg-base">
+              {item.videoId ? (
+                <div class="aspect-video-embed">
+                  <iframe
+                    src={embedUrl(item.provider ?? 'youtube', item.videoId)}
+                    title={item.title}
+                    loading="lazy"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowfullscreen
+                  />
+                </div>
+              ) : (
+                <div class="flex aspect-video items-center justify-center bg-gradient-to-br from-navy-deep to-base text-center">
+                  <div class="text-muted">
+                    <svg class="mx-auto h-10 w-10 text-accent/60" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M8 5v14l11-7z" />
+                    </svg>
+                    <p class="mt-2 text-sm">Demo video coming soon</p>
+                  </div>
+                </div>
+              )}
+              <figcaption class="px-5 py-3 text-sm text-muted">{item.caption}</figcaption>
+            </figure>
+          ) : (
+            <figure class="group relative overflow-hidden rounded-2xl border border-white/10">
+              <div class="aspect-video bg-gradient-to-br from-navy-mid/40 to-elevated">
+                <img
+                  src={item.src}
+                  alt={item.alt}
+                  class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  loading="lazy"
+                  onerror="this.style.display='none'"
+                />
+              </div>
+              <figcaption class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-base/90 to-transparent px-5 py-4 text-sm font-medium text-ink">
+                {item.caption}
+              </figcaption>
+            </figure>
+          )
+        )
+      }
+    </div>
+
+    <p class="mt-8 text-center text-sm text-muted">
+      More on Instagram —
+      <a href="https://instagram.com/e_zmusic" class="text-accent-soft hover:underline">@e_zmusic</a>
+    </p>
+  </div>
+</section>

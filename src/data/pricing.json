@@ -1,0 +1,9 @@
+{
+  "heading": "Lesson Rates",
+  "note": "All sessions include a detailed lesson plan.",
+  "tiers": [
+    { "duration": "30 minutes", "price": 25, "featured": false },
+    { "duration": "45 minutes", "price": 30, "featured": true },
+    { "duration": "1 hour", "price": 35, "featured": false }
+  ]
+}

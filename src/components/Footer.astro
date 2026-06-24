@@ -1,0 +1,21 @@
+---
+import site from '../data/site.json';
+const year = new Date().getFullYear();
+---
+
+<footer class="border-t border-white/10 bg-base">
+  <div class="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-5 py-10 sm:flex-row">
+    <div class="text-center sm:text-left">
+      <p class="font-display text-lg font-bold text-ink">Israel Vasquez</p>
+      <p class="text-sm text-muted">Music Lessons · {site.location}</p>
+    </div>
+
+    <div class="flex items-center gap-6 text-sm text-muted">
+      <a href={`tel:${site.phoneHref}`} class="hover:text-accent-soft">{site.phone}</a>
+      <a href={site.instagramUrl} class="hover:text-accent-soft">@{site.instagram}</a>
+    </div>
+  </div>
+  <p class="pb-6 text-center text-xs text-muted/70">
+    © {year} Israel Vasquez. All rights reserved.
+  </p>
+</footer>

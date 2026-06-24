@@ -1,0 +1,42 @@
+{
+  "heading": "What's Included",
+  "subheading": "Five disciplines, every level — all sessions include a detailed lesson plan.",
+  "offerings": [
+    {
+      "title": "Piano",
+      "level": "Beginner / Intermediate",
+      "icon": "piano",
+      "description": "Build a foundation in technique, reading, and theory, or develop the intermediate skills to play the music you love."
+    },
+    {
+      "title": "Marching Percussion",
+      "level": "All Levels",
+      "icon": "snare",
+      "description": "Snare, tenors, and bass — chops, technique, and the rep to be competition-ready in any drumline."
+    },
+    {
+      "title": "Keyboard Percussion",
+      "level": "All Levels",
+      "icon": "marimba",
+      "description": "Marimba, vibraphone, and bells. Four-mallet technique, sight-reading, and musicality."
+    },
+    {
+      "title": "World Latin Percussion",
+      "level": "All Levels",
+      "icon": "congas",
+      "description": "Congas, bongos, timbales, and hand percussion — grooves and traditions from across Latin music."
+    },
+    {
+      "title": "Drumset",
+      "level": "Beginner / Intermediate",
+      "icon": "drumset",
+      "description": "Groove, independence, and feel across rock, funk, and Latin styles for the kit player."
+    }
+  ],
+  "perks": [
+    "Detailed written lesson plan every session",
+    "Lessons tailored to your level and goals",
+    "Flexible scheduling",
+    "In-person instruction in El Paso"
+  ]
+}

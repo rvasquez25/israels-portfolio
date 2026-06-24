@@ -1,0 +1,98 @@
+# Decap CMS configuration (scaffold — not active until Netlify Identity +
+# Git Gateway are enabled). Maps the JSON files in src/data/ to editable
+# dashboard forms, so content can be managed without touching code.
+
+backend:
+  name: git-gateway
+  branch: main
+
+media_folder: public/images
+public_folder: /images
+
+collections:
+  - name: site
+    label: Site Settings
+    files:
+      - name: site
+        label: General
+        file: src/data/site.json
+        fields:
+          - { name: name, label: Name, widget: string }
+          - { name: tagline, label: Tagline, widget: string }
+          - { name: intro, label: Intro, widget: text }
+          - { name: phone, label: Phone (display), widget: string }
+          - { name: phoneHref, label: Phone (tel: link, e.g. +19158614863), widget: string }
+          - { name: instagram, label: Instagram handle, widget: string }
+          - { name: instagramUrl, label: Instagram URL, widget: string }
+          - { name: email, label: Email, widget: string, required: false }
+          - { name: location, label: Location, widget: string }
+
+  - name: about
+    label: About Me
+    files:
+      - name: about
+        label: About content
+        file: src/data/about.json
+        fields:
+          - { name: heading, label: Heading, widget: string }
+          - { name: photo, label: Photo, widget: image }
+          - { name: photoAlt, label: Photo alt text, widget: string }
+          - { name: paragraphs, label: Paragraphs, widget: list, field: { name: text, label: Paragraph, widget: text } }
+          - { name: credentials, label: Credentials, widget: list, field: { name: item, label: Credential, widget: string } }
+
+  - name: pricing
+    label: Lesson Rates
+    files:
+      - name: pricing
+        label: Rates
+        file: src/data/pricing.json
+        fields:
+          - { name: heading, label: Heading, widget: string }
+          - { name: note, label: Note, widget: string }
+          - name: tiers
+            label: Tiers
+            widget: list
+            fields:
+              - { name: duration, label: Duration, widget: string }
+              - { name: price, label: Price (USD), widget: number }
+              - { name: featured, label: Highlight as most popular, widget: boolean, default: false }
+
+  - name: lessons
+    label: Lessons
+    files:
+      - name: lessons
+        label: Lesson offerings
+        file: src/data/lessons.json
+        fields:
+          - { name: heading, label: Heading, widget: string }
+          - { name: subheading, label: Subheading, widget: string }
+          - name: offerings
+            label: Offerings
+            widget: list
+            fields:
+              - { name: title, label: Title, widget: string }
+              - { name: level, label: Level, widget: string }
+              - { name: icon, label: Icon (piano/snare/marimba/congas/drumset), widget: string }
+              - { name: description, label: Description, widget: text }
+          - { name: perks, label: Included perks, widget: list, field: { name: item, label: Perk, widget: string } }
+
+  - name: gallery
+    label: Gallery
+    files:
+      - name: gallery
+        label: Performances & demos
+        file: src/data/gallery.json
+        fields:
+          - { name: heading, label: Heading, widget: string }
+          - { name: subheading, label: Subheading, widget: string }
+          - name: items
+            label: Items
+            widget: list
+            fields:
+              - { name: type, label: Type (image/video), widget: string }
+              - { name: provider, label: Video provider (youtube/vimeo), widget: string, required: false }
+              - { name: videoId, label: Video ID, widget: string, required: false }
+              - { name: src, label: Image, widget: image, required: false }
+              - { name: alt, label: Image alt text, widget: string, required: false }
+              - { name: title, label: Title, widget: string, required: false }
+              - { name: caption, label: Caption, widget: string }

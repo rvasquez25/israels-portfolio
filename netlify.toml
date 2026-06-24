@@ -1,0 +1,10 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+# Netlify Forms automatically detects the static <form data-netlify="true">
+# rendered into dist/index.html at build time. Submissions appear in the
+# Netlify dashboard; configure an email/Slack notification there.

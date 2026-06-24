@@ -1,0 +1,53 @@
+---
+import pricing from '../data/pricing.json';
+---
+
+<section id="rates" class="py-20 md:py-28">
+  <div class="mx-auto max-w-5xl px-5">
+    <div class="text-center">
+      <h2 class="font-display text-3xl font-bold text-ink sm:text-4xl">
+        {pricing.heading}
+      </h2>
+      <p class="mt-3 text-muted">{pricing.note}</p>
+    </div>
+
+    <div class="mt-12 grid gap-5 sm:grid-cols-3">
+      {
+        pricing.tiers.map((tier) => (
+          <div
+            class:list={[
+              'relative rounded-2xl border p-7 text-center transition-transform hover:-translate-y-1',
+              tier.featured
+                ? 'border-gold/60 bg-gradient-to-b from-navy-deep to-elevated shadow-xl shadow-black/40'
+                : 'border-white/10 bg-elevated/50',
+            ]}
+          >
+            {tier.featured && (
+              <span class="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-gold px-3 py-1 text-xs font-bold uppercase tracking-wide text-base">
+                Most Popular
+              </span>
+            )}
+            <p class="text-sm font-semibold uppercase tracking-wider text-muted">
+              {tier.duration}
+            </p>
+            <p class="mt-3 font-display text-5xl font-extrabold text-ink">
+              <span class="align-top text-2xl text-accent-soft">$</span>
+              {tier.price}
+            </p>
+            <a
+              href="#contact"
+              class:list={[
+                'mt-6 inline-flex w-full items-center justify-center rounded-full px-5 py-2.5 text-sm font-semibold transition-colors',
+                tier.featured
+                  ? 'bg-accent text-base hover:bg-accent-soft'
+                  : 'border border-white/15 text-ink hover:border-accent/50 hover:text-accent-soft',
+              ]}
+            >
+              Choose {tier.duration.split(' ')[0]}
+            </a>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>
