@@ -6,7 +6,7 @@ import about from '../data/about.json';
   <div class="mx-auto max-w-6xl px-5">
     <div class="grid items-center gap-12 md:grid-cols-5">
       <!-- Photo -->
-      <div class="md:col-span-2">
+      <div class="order-2 md:order-1 md:col-span-2">
         <div class="rounded-2xl border border-white/10 p-1.5">
           <div class="aspect-[4/5] overflow-hidden rounded-xl bg-gradient-to-br from-navy-mid/40 to-elevated">
             <img
@@ -21,7 +21,7 @@ import about from '../data/about.json';
       </div>
 
       <!-- Copy -->
-      <div class="md:col-span-3">
+      <div class="order-1 md:order-2 md:col-span-3">
         <h2 class="font-display text-3xl font-bold text-ink sm:text-4xl">
           {about.heading}
         </h2>
